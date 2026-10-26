@@ -1,11 +1,8 @@
 #include <stdio.h>
-
 /**
  * main - Affiche un texte à l'écran
  *
- * Return: 0
- */
-
+ * Return: 0 */
 int main(void)
 {
 printf("with proper grammar, but the outcome is a piece of art,\n");
