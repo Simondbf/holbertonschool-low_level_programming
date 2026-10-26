@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-/*affichage d'un texte*/
+/**affichage d'un texte*/
 
 int main(void)
 {
