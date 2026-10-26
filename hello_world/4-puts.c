@@ -1,7 +1,9 @@
 #include <stdio.h>
 
 /**
- *affichage d'un texte
+ * main - Affiche un texte à l'écran
+ *
+ * Return: 0 si c'est ok
  */
 
 int main(void)
