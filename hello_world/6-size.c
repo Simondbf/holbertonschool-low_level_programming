@@ -5,5 +5,5 @@
  * Return: 0*/
 int main (void)
 {
-    printf("%zu\n", sizeof(int));
+    printf("Taille de " type() "%zu\n", sizeof(type()));
     return (0);}
