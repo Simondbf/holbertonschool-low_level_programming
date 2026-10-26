@@ -1,7 +1,6 @@
 #include <stdio.h>
 /**
  * main - entrée
- *
  * Return: 0
  */
 int main(void)
