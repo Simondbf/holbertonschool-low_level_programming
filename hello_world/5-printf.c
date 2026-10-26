@@ -3,7 +3,7 @@
 /**
  * main - Affiche un texte à l'écran
  *
- * Return 0 si c'est ok
+ * Return: 0
  */
 
 int main(void)
