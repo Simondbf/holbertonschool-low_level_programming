@@ -1,12 +1,12 @@
 #include <stdio.h>
 /**
- * main - affiche tous les nombres à un seul chiffre en base 10
+ * main - alphabet minuscule z → a
  * Return: 0
  */
 int main(void)
 {
 int i;
-for (i = 'z'; i != 97; i--)
+for (i = 'z'; i >= 97; i--)
 {
 putchar(i);
 }
