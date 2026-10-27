@@ -5,10 +5,12 @@
  */
 int main(void)
 {
-int i;
-for (i == "0"; i > "10"; i++)
+int i = 1;
+
+putchar ('0');
+while (i < "10")
 {
-putchar()
+putchar(i%)
 }
 putchar('\n');
 return (0);
