@@ -11,9 +11,9 @@ putchar('0');
 while (i <= 57)
 {
 putchar(',');
+putchar(' ');
 putchar(i);
 i++;
 }
-putchar('\n');
 return (0);
 }
