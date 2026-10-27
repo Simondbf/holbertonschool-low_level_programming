@@ -5,7 +5,7 @@
  */
 int main(void)
 {
-int i;
+short i;
 i = 49;
 putchar('0');
 while (i <= 57)
