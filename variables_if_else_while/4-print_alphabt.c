@@ -1,6 +1,6 @@
 #include <stdio.h>
 /**
- * main - entrée
+ * main - affiche alphabet sans e et q
  * Return: 0
  */
 int main(void)

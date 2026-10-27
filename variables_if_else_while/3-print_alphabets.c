@@ -1,6 +1,6 @@
 #include <stdio.h>
 /**
- * main - entrée
+ * main - affiche alphabet minuscule puis majuscule
  * Return: 0
  */
 int main(void)

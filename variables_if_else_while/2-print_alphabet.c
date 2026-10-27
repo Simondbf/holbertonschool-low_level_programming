@@ -1,6 +1,6 @@
 #include <stdio.h>
 /**
- * main - entrée
+ * main - affiche l'alphabet
  * Return: 0
  */
 int main(void)
