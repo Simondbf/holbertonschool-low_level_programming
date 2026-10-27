@@ -5,12 +5,12 @@
  */
 int main(void)
 {
-short i;
+int i;
 i = 49;
 putchar('0');
 while (i <= 57)
 {
-putchar(', ');
+putchar(',');
 putchar(i);
 i++;
 }
