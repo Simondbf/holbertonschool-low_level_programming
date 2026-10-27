@@ -1,23 +1,22 @@
 #include <stdio.h>
 /**
- * main - hexa en minuscule
+ * main - 0 → 9 suivi de , et d'un espace (sauf le 9)
  * Return: 0
  */
 int main(void)
 {
 int i;
 i = 48;
-if (i <= 57)
-{
 while (i <= 57)
 {
 putchar(i);
+if (i > 57)
+{
 putchar(',');
 putchar(' ');
+}
 i++;
 }
-}
-else
 putchar('\n');
 return (0);
 }
