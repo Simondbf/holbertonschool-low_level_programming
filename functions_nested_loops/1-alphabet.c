@@ -5,7 +5,11 @@
  */
 int main(void)
 {
-_putchar("print_alphabet(i)");
+char i;
+for (i = "97"; i <= "z";i++ )
+{
+_putchar(i);
+}
 _putchar('\n');
 return (0);
 }
