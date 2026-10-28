@@ -5,7 +5,7 @@
  */
 int main(void)
 {
-putchar("print_alphabet(i)");
+_putchar("print_alphabet(i)");
 _putchar('\n');
 return (0);
 }
