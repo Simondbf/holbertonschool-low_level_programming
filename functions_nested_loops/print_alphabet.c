@@ -2,7 +2,7 @@
 
 void print_alphabet(void)
 {
-int i;
+char i;
 for (i = "97"; i <= "z";i++ )
 {
 _putchar(i);
