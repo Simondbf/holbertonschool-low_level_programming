@@ -1,14 +1,10 @@
 #include <stdio.h>
 /**
- * main - 0 → 9 suivi de , et d'un espace (sauf le 9)
+ * main - affiche _putchar
  * Return: 0
  */
 int main(void)
 {
-int i;
-
-
-
-putchar('\n');
+printf("_putchar\n");
 return (0);
 }
