@@ -6,7 +6,7 @@
 int main(void)
 {
 int i;
-for (i = 97; i <= 'z''; i++)
+for (i = '97'; i <= 'z'; i++)
 {
 _putchar(i);
 }
