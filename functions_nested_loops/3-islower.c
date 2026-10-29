@@ -1,6 +1,7 @@
 #include "main.h"
 /**
- * int c - lettre eminuscule ?
+ * _islower - lettre eminuscule ?
+ * @c: caractère à vérifier
  * Return: 0
  */
 int _islower(int c)
