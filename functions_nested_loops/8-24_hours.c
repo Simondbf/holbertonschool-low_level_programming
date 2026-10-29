@@ -10,14 +10,14 @@ void jack_bauer(void)
 
 	for (h = 0; h <= 23; h++)
 	{
-		if (h < 10)
-		{
-			_putchar('0');
-		}
-		_putchar('0' + h);
-		_putchar(':');
 		for (min = 0; min <= 59; min++)
 		{
+			if (h < 10)
+			{
+				_putchar('0');
+			}
+			_putchar('0' + h);
+			_putchar(':');
 			if (min < 10)
 			{
 				_putchar('0');
