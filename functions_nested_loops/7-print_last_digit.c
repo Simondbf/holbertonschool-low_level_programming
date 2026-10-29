@@ -6,9 +6,12 @@
  */
 int print_last_digit(int n);
 {
+	int c;
+
 	if (n > 10)
 	{
-		return (n);
+		c = n % 10;
+		return (c);
 	}
 	else
 	{
