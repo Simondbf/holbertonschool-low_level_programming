@@ -11,7 +11,7 @@ while (i <= 10)
 {
 for (j = 97; j <= 'z'; j++)
 {
-_putchar('j');
+_putchar(j);
 }
 _putchar('\n');
 i++;
