@@ -1,4 +1,5 @@
 #include "main.h"
+
 /**
  * print_triangle - dessiner un triangle
  * Return: 0
@@ -9,9 +10,9 @@ void print_triangle(int size)
 	int colonne, ligne;
 
 	if (size <= 0)
-    {
-		_putchar('\n'); 
-    }
+	{
+		_putchar('\n');
+	}
 	else
 	{
 		for (ligne = 1; ligne <= size; ligne++)
