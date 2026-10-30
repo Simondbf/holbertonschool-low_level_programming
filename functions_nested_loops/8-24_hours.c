@@ -19,11 +19,8 @@ void jack_bauer(void)
 			}
 			else
 			{
-				int h2 = h / 10;
-				int h1 = h % 10;
-
-				_putchar('0' + h2);
-				_putchar('0' + h1);
+				_putchar('0' + (h / 10));
+				_putchar('0' + (h % 10));
 			}
 			_putchar(':');
 			if (min < 10)
@@ -33,11 +30,8 @@ void jack_bauer(void)
 			}
 			else
 			{
-				int min2 = min / 10;
-				int min1 = min % 10;
-
-				_putchar('0' + min2);
-				_putchar('0' + min1);
+				_putchar('0' + (min / 10));
+				_putchar('0' + (min % 10));
 			}
 			_putchar('\n');
 		}

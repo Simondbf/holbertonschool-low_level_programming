@@ -1,4 +1,6 @@
 #include "main.h"
+#include <stdio.h>
+
 /**
  * print_to_98 - affiche tous les nombres entiers jusqu'à 98 + retour ligne
  * Return: 0
@@ -6,34 +8,32 @@
 */
 void print_to_98(int n)
 {
-	int a = 98;
-
-	for (; n < a; n++)
+	if (n >= 98)
 	{
-		if (n < 0)
+		for (; n >= 98; n--)
 		{
-			_putchar('-');
+			if (n == 98)
+			{
+				printf("%d\n", n);
+			}
+			else
+			{
+				printf("%d, ", n);
+			}
 		}
-		if (n > 9)
-		{
-			_putchar('0' + n / 10);
-		}
-		_putchar('0' + n % 10);
-		_putchar(',');
-		_putchar(' ');
 	}
-	for (; n > a; n--)
+	else
 	{
-		if (n > (a + 1))
+		for (; n <= 98; n++)
 		{
-			_putchar('0' + n / 100);
+			if (n == 98)
+			{
+				printf("%d\n", n);
+			}
+			else
+			{
+				printf("%d, ", n);
+			}
 		}
-		_putchar('0' + n / 10);
-		_putchar('0' + n % 10);
-		_putchar(',');
-		_putchar(' ');
 	}
-	_putchar('0' + n / 10);
-	_putchar('0' + n % 10);
-	_putchar('\n');
 }
