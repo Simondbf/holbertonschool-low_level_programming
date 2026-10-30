@@ -1,6 +1,6 @@
 #include "main.h"
 /**
- * print_numbers - addiction 2 entiers
+ * print_numbers - affiche les nombres  de 0 à 9
  * Return: 0
 */
 void print_numbers(void)
