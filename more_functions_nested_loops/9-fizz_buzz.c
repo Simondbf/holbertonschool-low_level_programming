@@ -11,7 +11,7 @@ int main(void)
 	{
 		if (i == 1)
 		{
-			printf("1")
+			printf("1");
 		}
 		else if (i % 3 == 0 && i % 5 == 0)
 		{
