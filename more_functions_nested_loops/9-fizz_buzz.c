@@ -11,7 +11,7 @@ int main(void)
 	{
 		if (i == 1)
 		{
-			printf("1");
+			printf("%d", i);
 		}
 		else if (i % 3 == 0 && i % 5 == 0)
 		{
@@ -28,10 +28,6 @@ int main(void)
 			{
 				printf("\n");
 			}
-		}
-		if (i == 100)
-		{
-			printf("\n");
 		}
 		else
 		{
