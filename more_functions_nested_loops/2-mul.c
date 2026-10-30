@@ -1,6 +1,6 @@
 #include "main.h"
 /**
- * mul - addiction 2 entiers
+ * mul - multiplis 2 entiers
  * Return: 0
  * @a: nombre
  * @b: nombre
