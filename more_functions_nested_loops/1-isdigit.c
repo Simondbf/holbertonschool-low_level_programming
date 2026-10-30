@@ -2,7 +2,7 @@
 /**
  * _isdigit - chiffre (0 à 9) ?
  * Return: 0
- * @c: lettre
+ * @c: chiffre
 */
 int _isdigit(int c)
 {
