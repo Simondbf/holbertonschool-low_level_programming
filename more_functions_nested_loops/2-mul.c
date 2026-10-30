@@ -7,5 +7,5 @@
 */
 int mul(int a, int b)
 {
-	return ('0' + a + b);
+	return ('0' + a * b);
 }
