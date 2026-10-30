@@ -1,6 +1,6 @@
 #include "main.h"
 /**
- * print_most_numbers - affiches les chiffres de 0 à 9 sauf 2 et 4 + retour ligne
+ * print_most_numbers - affiche de 0 à 9 sauf 2 et 4 + retour ligne
  * Return: 0
 */
 void print_most_numbers(void)
