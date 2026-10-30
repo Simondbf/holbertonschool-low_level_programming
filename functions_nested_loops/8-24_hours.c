@@ -37,3 +37,6 @@ void jack_bauer(void)
 		}
 	}
 }
+
+
+/* enlever les if*/
