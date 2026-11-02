@@ -21,4 +21,4 @@ Nous avons testé dans les différentes tâches du projet uniquement les boucles
 
 5. Enseignements pratiques pour le développement logiciel
 
-Au final, avec toutes ces tâches effectuées, toutes ces expérimentations faites, malgré les manques comme vu précédemment, et avec tous les résultats analysés, nous pouvons dire avec assurance que plus un programme est simple, moins les ressources monopolisées seraient importantes. Par conséquent, une rapidité d'exécution du programme en cours permet ainsi une libération de la place sur la mémoire vive plus rapide.
+Au final, avec toutes ces expérimentations faites malgré les manques comme vu précédemment, et avec tous les résultats analysés, nous pouvons dire avec assurance que plus un programme est simple, moins les ressources monopolisées du CPU seraient importantes. Par conséquent, une rapidité d'exécution du programme en cours permet ainsi une libération de la place sur la mémoire vive plus rapidement.
