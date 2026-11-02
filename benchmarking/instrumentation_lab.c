@@ -54,7 +54,7 @@ int main(void)
 {
     unsigned long checksum;
 
-	start = clock();
+	float start = clock();
 
 	start_build = clock();
 	build_dataset();
