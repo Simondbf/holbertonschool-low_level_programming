@@ -62,9 +62,6 @@ int main(void)
 	clock_t end_reduce;
 	clock_t end;
 
-	if (checksum == 0ul)
-		printf("impossible\n");
-
 	start = clock();
 
 	start_build = clock();
@@ -80,6 +77,9 @@ int main(void)
 	end_reduce = clock();
 
 	end = clock();
+
+	if (checksum == 0ul)
+		printf("impossible\n");
 
 	printf("TOTAL seconds: %.6f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
 	printf("BUILD_DATA seconds: %.6f \n", (double)(end_build - start_build) / (double)CLOCKS_PER_SEC);
