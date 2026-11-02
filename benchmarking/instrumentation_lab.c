@@ -56,24 +56,24 @@ int main(void)
 
 	float start = clock();
 
-	start_build = clock();
+	float start_build = clock();
 	build_dataset();
-	end_build = clock();
+	float end_build = clock();
 
-	start_process = clock();
+	float start_process = clock();
     process_dataset();
-	end_process = clock();
+	float end_process = clock();
 
-	start_reduce = clock();
+	float start_reduce = clock();
 	checksum = reduce_checksum();
-	end_reduce = clock();
+	float end_reduce = clock();
 
-	end = clock();
+	float end = clock();
 
     if (checksum == 0ul)
         printf("impossible\n");
 
-	printf("TOTAL seconds: %.6f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
+	printf("TOTAL seconds: %.6f \n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 	printf("BUILD_DATA seconds: %.6f \n", (float)(end_build - start_build) / (float)CLOCKS_PER_SEC);
 	printf("PROCESS seconds: %.6f \n", (float)(end_process - start_process) / (float)CLOCKS_PER_SEC);
 	printf("REDUCE seconds: %.6f \n", (float)(end_reduce - start_reduce) / (float)CLOCKS_PER_SEC);
