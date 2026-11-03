@@ -39,4 +39,4 @@ void jack_bauer(void)
 }
 
 
-/* enlever les if*/
+/* enlever les if et tout mettre sous la boucle for avec _putchar() heure + : + minutes*/
