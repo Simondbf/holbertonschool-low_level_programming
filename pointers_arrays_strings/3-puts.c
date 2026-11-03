@@ -1,10 +1,11 @@
 #include "main.h"
 /**
- * _strlen - retourne la longueur d'une chaine de caractère
+ * _puts - affiche chaine de caractère + retour à la ligne
  * Return: 0
- * @s: pointeur s
+ * @str: pointeur
  */
 void _puts(char *str)
 {
-
+	_putchar(str);
+	_putchar('\n');
 }
