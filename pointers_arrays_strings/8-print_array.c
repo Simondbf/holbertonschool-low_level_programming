@@ -1,22 +1,27 @@
 #include "main.h"
+#include <stdio.h>
 /**
  * print_array - affiche n éléments d’un tableau d’entiers + retour ligne
  * Return: 0
  * @a: pointeur
- * @n: nombre d'élément à mettre dans le tableau
+ * @n: taille du tableau
  */
 void print_array(int *a, int n)
 {
-	int longueur = 0, i = 0;
+	int i = 0;
+	int nbr = 0;  /*nombre à imprimer dans le tableau*/
 
-	while (a[longueur] != '\0')
+	for (; i <= n; i++)
 	{
-		longueur++;
+		if (i == n)
+		{
+			printf("%d\n", a[nbr]);
+		}
+		else
+		{
+		printf("%d, ", a[nbr]);
+		}
+		nbr++;
 	}
-	while (a[i] != '\0')
-	{
-		_putchar(n);
-		i++;
-	}
-	_putchar('\n');
+
 }
