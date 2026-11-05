@@ -4,25 +4,26 @@
  * Return: 0
  * @str: pointeur
  */
-void puts_half(char *str);
+void puts_half(char *str)
 {
+	int longueur = 0, i = 0;
 
-
-
-	_putchar('\n');
-}
-
-
-
-{
-	int i = 0;
-
-	for (; *str != '\0'; str++, i++)
+	while (longueur != '\0')
 	{
-		if (i % 2 == 0)
-		{
-		_putchar(*str);
-		}
+		longueur++;
+	}
+	if (longueur % 2 != 0)
+	{
+		i = (longueur + 1) / 2;
+	}
+	else
+	{
+		i = (longueur) / 2;
+	}
+
+	while (i != '\0')
+	{
+		_putchar(str);
 	}
 	_putchar('\n');
 }
