@@ -11,6 +11,10 @@ void print_array(int *a, int n)
 	int i = 0;
 	int nbr = 0;  /*nombre à imprimer dans le tableau*/
 
+	if (n <= 0)
+	{
+		printf("\n");
+	}
 	for (; i < n; i++)
 	{
 		if (i == n - 1) /*-1 car va trop loin sinon*/
