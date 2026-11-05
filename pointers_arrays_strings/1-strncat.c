@@ -4,7 +4,7 @@
  * Return: 0
  * @dest: pointeur
  * @src: pointeur
- * @int: nombre max d'octet de src
+ * @n: nombre max d'octet de src
  */
 char *_strncat(char *dest, char *src, int n)
 {
