@@ -11,9 +11,9 @@ void print_array(int *a, int n)
 	int i = 0;
 	int nbr = 0;  /*nombre à imprimer dans le tableau*/
 
-	for (; i <= n; i++)
+	for (; i < n; i++)
 	{
-		if (i == n)
+		if (i == n - 1) /*-1 car va trop loin sinon*/
 		{
 			printf("%d\n", a[nbr]);
 		}
