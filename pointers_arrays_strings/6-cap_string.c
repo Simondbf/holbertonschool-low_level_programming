@@ -13,32 +13,32 @@ char *cap_string(char *str)
 		if (str[i] == ' ' || str[i] == '\t')
 		{
 			if (str[i + 1] >= 'a' && str[i + 1] <= 'z')
-				str[i + 1] += 32;
+				str[i + 1] -= 32;
 		}
 		if (str[i] == '\n' || str[i] == ',')
 		{
 			if (str[i + 1] >= 'a' && str[i + 1] <= 'z')
-				str[i + 1] += 32;
+				str[i + 1] -= 32;
 		}
 		if (str[i] == ';' || str[i] == '.')
 		{
 			if (str[i + 1] >= 'a' && str[i + 1] <= 'z')
-				str[i + 1] += 32;
+				str[i + 1] -= 32;
 		}
 		if (str[i] == '!' || str[i] == '?' || str[i] == '"')
 		{
 			if (str[i + 1] >= 'a' && str[i + 1] <= 'z')
-				str[i + 1] += 32;
+				str[i + 1] -= 32;
 		}
 		if (str[i] == '(' || str[i] == ')')
 		{
 			if (str[i + 1] >= 'a' && str[i + 1] <= 'z')
-				str[i + 1] += 32;
+				str[i + 1] -= 32;
 		}
 		if (str[i] == '{' || str[i] == '}')
 		{
 			if (str[i + 1] >= 'a' && str[i + 1] <= 'z')
-				str[i + 1] += 32;
+				str[i + 1] -= 32;
 		}
 	}
 	return (str);
