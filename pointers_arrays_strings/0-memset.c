@@ -1,6 +1,6 @@
 #include "main.h"
 /**
- * *_memset - 
+ * *_memset - remplit zone mémoire avec un octer de valeur constante
  * Return: 0
  * @s: pointeur
  * @b: valeur constante
