@@ -16,6 +16,7 @@ void print_chessboard(char (*a)[8])
 		while (col < 8)
 		{
 			_putchar(a[row][col]);
+			/*  *( * board + row) + col)*/
 			col++;
 		}
 		_putchar('\n');
