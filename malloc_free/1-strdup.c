@@ -7,8 +7,9 @@
  */
 char *_strdup(char *str)
 {
-	char *p, size = 0;
-	int i = 0, j = 0;
+	char *p;
+	int size = 0;
+	int i = 0;
 
 	if (str == 0)
 	{
@@ -18,16 +19,15 @@ char *_strdup(char *str)
 	{
 		size++;
 	}
-	str = malloc(sizeof(char) * size);
+	size++;							/*pour prendre null byte*/
 	p = malloc(sizeof(char) * size);
 	if (str == NULL)
 	{
 		return (NULL);
 	}
-	for (i = 0; size <= '\0'; i++, j++)
+	for (i = 0; i <= size; i++)
 	{
-		p[j] = str[i];
+		p[i] = str[i];
 	}
-	return (str);
-	free(str);
+	return (p);
 }
