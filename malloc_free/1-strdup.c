@@ -3,7 +3,7 @@
 /**
  * _strdup - return pointeur → new memory zone contenant chaine de caractère
  * @str: pointeur
- * Return: pointeur vers chaine duppliquée, ou NULL en cas d'échec
+ * Return: pointer vers chaine duppliquée, ou NULL en cas d'échec
  */
 char *_strdup(char *str)
 {
