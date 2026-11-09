@@ -19,7 +19,7 @@ char *_strdup(char *str)
 	{
 		size++;
 	}
-	size++;							/*pour prendre null byte*/
+	size++;							/*pour inclure null byte*/
 	p = malloc(sizeof(char) * size);
 	if (p == NULL)
 	{
