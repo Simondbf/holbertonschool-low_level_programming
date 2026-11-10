@@ -1,9 +1,9 @@
 #include "main.h"
 #include <stdlib.h>
 /**
- * malloc_checked - libération mémoire de la grille 2D de la tache 3
- * @b: entier non signé
- * Return: pointeur vers le tableau 2D, ou NULL en cas d'échec
+ * malloc_checked - alloue de la mémoire avec malloc et quitte si ça échoue
+ * @b: nombre d'octets à allouer
+ * Return: pointeur vers la mémoire allouée
  */
 void *malloc_checked(unsigned int b)
 {
