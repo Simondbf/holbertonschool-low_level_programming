@@ -8,10 +8,12 @@
  */
 void free_grid(int **grid, int height)
 {
-	int h;
+	int i;
 
-	for (h = 0; h < height - 1; h++)
+	if (grid == NULL)
 	{
+		for (i = 0; i < height; i++)
+			free(grid[i]);
 		free(grid);
 	}
 }
