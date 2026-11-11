@@ -19,9 +19,10 @@ char *string_nconcat(char *s1, char *s2, unsigned int n)
 		s2 = "";
 
 	/*taille de s3 + \0*/
-	while (s1[i] != '\0' ||s2[j] != '\0')
-		{ i++;
-		j++; }
+	for (; s1[i] != '\0'; i++)
+	{	}
+	for (; s2[j] != '\0'; j++)
+	{	}
 
 	if (n < j)
 		k = i + n + 1;
