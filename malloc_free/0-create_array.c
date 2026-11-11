@@ -1,10 +1,12 @@
 
 #include "main.h"
 #include <stdlib.h>
+
 /**
  * create_array - crée un tableau de caractères
  * @size: nombre de caractères à réserver
  * @c: caractère utilisé pour initialiser le tableau
+ *
  * Return: pointeur vers le tableau, ou NULL en cas d'échec
  */
 char *create_array(unsigned int size, char c)
