@@ -25,31 +25,19 @@ char *string_nconcat(char *s1, char *s2, unsigned int n)
 	{	}
 
 	if (n < j)
-		k = i + n + 1;
-	else
-		k = i + j + 1;
+		j = n;
 
 	/*malloc avec la bonne taille: k puis conséquence si NULL*/
-	s3 = malloc(k);
+	s3 = malloc(i + j + 1);
 	if (s3 == NULL)
 		return (NULL);
 
 	/*coller les 2 chaines sur la new zone mémoire*/
-	for (i = 0, k = 0; s1[i] != '\0'; i++, k++)
-		s3[k] = s1[i];
+	for (k = 0; k < i; k++)
+		s3[k] = s1[k];
+	for (k = 0; k < j; k++)
+		s3[i + k] = s2[k];
 
-	if (n >= j)
-	{
-		for (j = 0; s2[j] != '\0'; j++, k++)
-			s3[k] = s2[j];
-	}
-
-	else
-	{
-		for (j = 0; j < n; j++, k++)
-			s3[k] = s2[j];
-	}
-
-	s3[k] = '\0';
+	s3[i + j] = '\0';
 	return (s3);
 }
