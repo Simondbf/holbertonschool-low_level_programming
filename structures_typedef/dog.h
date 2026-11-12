@@ -7,11 +7,11 @@
  * @owner: nom du propriétaire
  * Description: structure qui regroupe les informations d'un chien
  */
-typedef struct dog
+struct dog
 {
 	char *name;
 	int age;
 	char *owner;
-} my_dog;
+};
 
 #endif
