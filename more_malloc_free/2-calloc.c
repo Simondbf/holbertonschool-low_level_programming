@@ -8,10 +8,12 @@
  */
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
-	unsigned int *p, i, j, taille;
+	unsigned int i, j, taille;
+	char *p;
 
 	if (size == 0 || nmemb == 0)
 		return (NULL);
+
 	/*taille du tableau*/
 	taille = size * nmemb;
 
