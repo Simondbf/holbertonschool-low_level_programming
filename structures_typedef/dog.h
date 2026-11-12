@@ -3,9 +3,9 @@
 /* dog - structure */
 typedef struct dog
 {
-	char name;
+	char *name;
 	int age;
-	char owner;
+	char *owner;
 } my_dog;
 
 #endif
