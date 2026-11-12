@@ -23,9 +23,9 @@ void *_calloc(unsigned int nmemb, unsigned int size)
 		return (NULL);
 
 	/*allocation chaque octet à 0, en gros chaque case du tableau*/
-	for (; i < taille; i++)
+	for (i = 0; i < taille; i++)
 	{
-		for (; j < taille; j++)
+		for (j = 0; j < taille; j++)
 			p[i] = 0;
 	}
 
