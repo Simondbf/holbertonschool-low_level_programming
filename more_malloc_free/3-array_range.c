@@ -21,6 +21,7 @@ int *array_range(int min, int max)
 	if (p == NULL)
 		return (NULL);
 
+	/*j est le doigt et i le contenu des cases*/
 	for (i = min, j = 0; i <= max; i++, j++)
 		p[j] = i;
 
