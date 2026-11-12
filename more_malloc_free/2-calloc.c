@@ -8,7 +8,7 @@
  */
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
-	unsigned int i, j, taille;
+	unsigned int i, taille;
 	char *p;
 
 	if (size == 0 || nmemb == 0)
@@ -22,12 +22,10 @@ void *_calloc(unsigned int nmemb, unsigned int size)
 	if (p == NULL)
 		return (NULL);
 
-	/*allocation chaque octet à 0, en gros chaque case du tableau*/
+	/*allocation chaque octet à 0, en gros chaque case du tableau :*/
+			/*ligne mémoire et pas tableau 2D*/
 	for (i = 0; i < taille; i++)
-	{
-		for (j = 0; j < taille; j++)
-			p[i] = 0;
-	}
+		p[i] = 0;
 
 	return (p);
 }
