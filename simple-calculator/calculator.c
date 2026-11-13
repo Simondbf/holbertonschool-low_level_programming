@@ -6,9 +6,6 @@ int main(void)
 	/* Tache 1 : présentation de la calculatrice avec un message de bienvenue, le menu et quitter le programme */
 	int choix;
 
-	/* permet de récuperer la valeur de l'utilisateur*/
-	scanf("%d");
-
 	/* affichage de la calculatrice */
 	printf("Simple Calculator\n");
 	printf("1) Add\n");
@@ -16,8 +13,13 @@ int main(void)
 	printf("3) Multiply\n");
 	printf("4) Divide\n");
 	printf("0) Quit\n");
+	/* affichage du choix de l'utilisateur sur le menu précédent */
 	printf("Choice: %d\n", choix);
-	printf("Bye!\n");
+
+	/* permet de récuperer la valeur émis par l'utilisateur */
+	scanf("%d", choix);
+	if (choix == 0)
+		printf("Bye!\n");
 
 	return (0);
  }
