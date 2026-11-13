@@ -14,9 +14,9 @@ int main(void)
 	printf("4) Divide\n");
 	printf("0) Quit\n");
 	/* permet de récuperer la valeur émis par l'utilisateur */
-	printf(scanf("%d", choix));
+	printf(scanf("%d", &choix));
 	/* affichage du choix de l'utilisateur sur le menu précédent */
-	printf("Choice: %d\n", choix);
+	printf("Choice: %d\n", &choix);
 	if (choix == 0)
 		printf("Bye!\n");
 
