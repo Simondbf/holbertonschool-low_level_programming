@@ -3,9 +3,13 @@
 
 int main(void)
 {
-	/*Tache 1 : présentation de la calculatrice avec un message de bienvenue, le menu et quitter le programme*/
+	/* Tache 1 : présentation de la calculatrice avec un message de bienvenue, le menu et quitter le programme */
 	int choix;
 
+	/* permet de récuperer la valeur de l'utilisateur*/
+	scanf("%d");
+
+	/* affichage de la calculatrice */
 	printf("Simple Calculator\n");
 	printf("1) Add\n");
 	printf("2) Subtract\n");
