@@ -9,7 +9,7 @@ void print_dog(struct dog *d)
 {
 	/*précaution*/
 	if (d == NULL)
-		;
+		return;
 
 	/*conditions spécifiques de la consigne*/
 	if (d->name == NULL)
