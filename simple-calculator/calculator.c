@@ -14,6 +14,7 @@ int main(void)
 	printf("4) Divide\n");
 	printf("0) Quit\n");
 	/* permet de récuperer la valeur émis par l'utilisateur */
+	/* je veux ici prendre l'adresse du pointeur choix pour écrire directement la réponse de l'utilisateur dans et non pas réatribuer "choix" */
 	printf(scanf("%d", &choix));
 	/* affichage du choix de l'utilisateur sur le menu précédent */
 	printf("Choice: %d\n", &choix);
