@@ -6,16 +6,13 @@
  */
 void print_dog(struct dog *d)
 {
-	char name, owner;
-	float age;
-
 	if (d == NULL)
-		return (NULL);
+		printf("");
 
-	if (name == NULL)
+	if (d->name == NULL)
 		printf("name: (%s)\n", d->name);
-	if (age == 0)
+	if (d->age == 0)
 		printf("age: (%d.6f)\n", d->age);
-	if (name == NULL)
+	if (d->name == NULL)
 		printf("owner: (%s)\n", d->owner);
 }
