@@ -4,7 +4,7 @@
 int main(void)
 {
 	/* Tache 1 : présentation de la calculatrice avec un message de bienvenue, le menu et quitter le programme */
-	int *choix;
+	float choix;
 
 	/* affichage de la calculatrice */
 	printf("Simple Calculator\n");
@@ -15,9 +15,9 @@ int main(void)
 	printf("0) Quit\n");
 	/* permet de récuperer la valeur émis par l'utilisateur */
 	/* je veux ici prendre l'adresse du pointeur choix pour écrire directement la réponse de l'utilisateur dans et non pas réatribuer "choix" */
-	printf(scanf("%d", &choix));
+	scanf("%lf", &choix);
 	/* affichage du choix de l'utilisateur sur le menu précédent */
-	printf("Choice: %d\n", &choix);
+	printf("Choice: %lf\n", &choix);
 	if (choix == 0)
 		printf("Bye!\n");
 
