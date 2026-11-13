@@ -45,7 +45,24 @@ int main(void)
 			resultat = A + B;
 
 			printf("Result: %d\n", resultat);
+		}
 
+		/* Tache 3 : ajouter la soustraction entre deux nombre A et B. Ces derniers ont été ajouté
+		* lors de la déclaration au début de la fonction pour être utilisé sur d'autres opérations*/
+		if (choix == 2)
+		{
+			/* choix de A par l'utilisateur */
+			scanf("%d", &A);
+			printf("A: %d\n", A);
+
+			/* choix de B par l'utilisateur */
+			scanf("%d", &B);
+			printf("B: %d\n", B);
+
+			/* Calcul A + B */
+			resultat = A - B;
+
+			printf("Result: %d\n", resultat);
 		}
 	}
 
