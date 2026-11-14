@@ -1,5 +1,5 @@
 #include <stdio.h>
-/*calcculatrice*/
+/*calculatrice*/
 
 int main(void)
 {
@@ -28,10 +28,11 @@ int main(void)
 		scanf("%d", &choix);
 		/* affichage du choix de l'utilisateur sur le menu précédent */
 		printf("Choice: %d\n", choix);
+
+		if (choix != 1 && choix != 2 &&choix != 3 &&choix != 4 &&choix != 0)
+			printf("Invalid choice\n");
 		if (choix == 0)
 			printf("Bye!\n");
-		if (choix != 1 ||choix != 2 ||choix != 3 ||choix != 4 ||choix != 0)
-			printf("Invalid choice\n");
 
 		/* Tache 2 : ajouter l'addition entre deux nombre A et B. Ces derniers ont été ajouté
 		*lors de la déclaration au début de la fonction pour être utilisé sur d'autres opérations*/
@@ -102,12 +103,15 @@ int main(void)
 			if (B == 0)
 				printf("Error: division by zero\n");
 
+			else
+			{
 			printf("B: %g\n", B);
 
 			/* Calcul A / B */
 			resultat = A / B;
 
 			printf("Result: %g\n", resultat);
+			}
 		}
 	}
 
