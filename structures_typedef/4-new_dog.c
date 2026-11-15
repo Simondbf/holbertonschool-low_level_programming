@@ -2,14 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 /**
- * new_dog - nouveau chien
- * @name: nom
- * @age: age
- * @owner: proprio du chien
- * Return: NULL en cas d'échec
+ * _strcpy - fonction de copie dans la zone mémoire
+ * @dest: zone de destination à copier
+ * Return: dest_copy, zone de mémoire copier
  */
-
-
 char *_strcpy(char *dest)
 {
 	int i = 0, size = 0;
@@ -28,7 +24,13 @@ char *_strcpy(char *dest)
 	return (dest_copy);
 }
 
-
+/**
+ * new_dog - nouveau chien
+ * @name: nom
+ * @age: age
+ * @owner: proprio du chien
+ * Return: NULL en cas d'échec
+ */
 dog_t *new_dog(char *name, float age, char *owner)
 {
 	dog_t *dog2;
