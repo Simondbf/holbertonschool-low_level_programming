@@ -2,8 +2,9 @@
 #include <stdlib.h>
 
 /**
-* print-name - affiche un nom
+* print_name - affiche un nom
 * @name: string vers nom (caractère)
+* @f: pointeur de la fonction
 * Return - rien car void
 */
 void print_name(char *name, void (*f)(char *))
