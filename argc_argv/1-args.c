@@ -2,7 +2,6 @@
 
 /**
  * main - affiche le nombre d'arguments
- * programme qui écrit son propre nom
  * @argc: argument - nombre de mot
  * @argv: tableau des arguments
  * Return: 0
