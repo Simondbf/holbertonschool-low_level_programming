@@ -1,0 +1,1 @@
+Découverte des arguments argc (nombre de mot dans le terminal) et argv (tableau de chaines de caractères sur ce qui est tapé dans le terminal)
