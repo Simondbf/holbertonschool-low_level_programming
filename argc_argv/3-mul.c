@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
 	int i;
 	int resultat;
 
+	if (i < 3)
+		return ("ERROR");
+
 	for (i = 1; i < argc - 1; i++)
 	{
 		resultat = atoi(argv[1]) * atoi(argv[2]);
