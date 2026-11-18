@@ -16,7 +16,10 @@ int main(int argc, char *argv[])
 	for (i = 1; i < argc - 1; i++)
 	{
 		if (i < 3)
+		{
 			printf("ERROR\n");
+			break;
+		}
 		resultat = atoi(argv[1]) * atoi(argv[2]);
 		printf("%d\n", resultat);
 	}
