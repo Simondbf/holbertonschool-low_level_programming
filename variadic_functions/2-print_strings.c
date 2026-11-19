@@ -3,7 +3,7 @@
 #include "variadic_functions.h"
 
 /**
- * print_numbers - affiche de chaines de caractères
+ * print_strings - affiche de chaines de caractères
  * @separator: chaine de caractère de séparation entre les nombres
  * @n: constante <= 0
  * Return: somme de tous les parametres
