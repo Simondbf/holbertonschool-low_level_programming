@@ -17,7 +17,7 @@ void print_numbers(const char *separator, const unsigned int n, ...)
 
 	for (i = 0; i < n; i++)
 	{
-		if (separator == 0 || i == n - 1)
+		if (separator == 0 || i == n - 1) /*n-1 pour avoir le dernier entier*/
 			printf("%d", va_arg(nbre, int));
 		else
 			printf("%d%s", va_arg(nbre, int), separator);
