@@ -1,1 +1,1 @@
-fonctions variatiques
+fonctions variatiques: accepte nombres variables d'arguments et de dufférents types aussi
