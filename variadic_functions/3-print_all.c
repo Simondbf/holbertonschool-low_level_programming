@@ -23,19 +23,19 @@ void print_all(const char * const format, ...)
 	{
 		switch (format[index])
 		{
-			case 1:
+			case c:
 				printf("%c\n", va_arg(chain, int));
 				break;
 
-			case 2:
+			case i:
 				printf("%d", va_arg(chain, int));
 				break;
 
-			case 3:
+			case f:
 				printf("%f", va_arg(chain, double));
 				break;
 
-			case 4:
+			case s:
 				if (va_arg(chain, char *) == NULL)
 					printf("(nil)");
 
