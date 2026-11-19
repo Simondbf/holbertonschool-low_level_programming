@@ -11,6 +11,10 @@ void print_all(const char * const format, ...)
 {
 	va_list chain;
 	int index = 0;
+	char c;
+	int i;
+	float f;
+	char *s;
 
 	if (format == NULL)
 	{
