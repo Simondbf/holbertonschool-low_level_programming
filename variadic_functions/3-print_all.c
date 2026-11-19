@@ -11,10 +11,6 @@ void print_all(const char * const format, ...)
 {
 	va_list chain;
 	int index = 0;
-	char c;
-	int i;
-	float f;
-	char *s;
 
 	if (format == NULL)
 	{
@@ -27,19 +23,19 @@ void print_all(const char * const format, ...)
 	{
 		switch (format[index])
 		{
-			case c:
+			case 'c':
 				printf("%c\n", va_arg(chain, int));
 				break;
 
-			case i:
+			case 'i':
 				printf("%d", va_arg(chain, int));
 				break;
 
-			case f:
+			case 'f':
 				printf("%f", va_arg(chain, double));
 				break;
 
-			case s:
+			case 's':
 				if (va_arg(chain, char *) == NULL)
 					printf("(nil)");
 
