@@ -18,7 +18,7 @@ void print_strings(const char *separator, const unsigned int n, ...)
 
 	for (i = 0; i < n; i++)
 	{
-		cool = va_arg(chains, char *);
+		cool = va_arg(chains, int);
 
 		if (separator == 0 || i == n - 1) /*n-1 pour avoir le dernier entier*/
 		{
