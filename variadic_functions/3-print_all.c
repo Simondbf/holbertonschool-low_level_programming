@@ -21,7 +21,7 @@ void print_all(const char * const format, ...)
 	va_start(chain, format);
 	while (format[index] != '\0')
 	{
-		switch (index)
+		switch (format[index])
 		{
 			case 1:
 				printf("%c\n", va_arg(chain, int));
