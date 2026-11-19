@@ -3,40 +3,46 @@
 #include "variadic_functions.h"
 
 /**
- * print_all - affiche 
- * @separator: chaine de caractère de séparation entre les nombres
- * @n: constante <= 0
- * Return: 0 si = null
+ * print_all - affiche les valeurs de différents types
+ * @flormat: constante <= 0
+ * Return: pas car void
  */
 void print_all(const char * const format, ...)
 {
 	va_list chain;
+	int index = 0;
 
 	if (format == NULL)
-		{
-			putchar('\n');
-			return (0);
-		}
-
-	va_start (chain, format);
-	while ()
 	{
-		switch ()
+		putchar('\n');
+		return;
+	}
+
+	va_start(chain, format);
+	while (format[index] != '\0')
+	{
+		switch (index)
 		{
 			case 1:
-
+				printf("%c\n", va_arg(chain, int));
 				break;
+
 			case 2:
+				printf("%d", va_arg(chain, int));
+				break;
 
-				break;
 			case 3:
-			
+				printf("%f", va_arg(chain, double));
 				break;
+
 			case 4:
-			
+				if (va_arg(chain, char *) == NULL)
+					printf("(nil)");
+
+				printf("%s", va_arg(chain, char *));
 				break;
-			case 5:
-			
+
+			default:
 				break;
 		}
 	}
