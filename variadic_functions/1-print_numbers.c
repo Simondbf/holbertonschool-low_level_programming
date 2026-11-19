@@ -6,7 +6,7 @@
  * print_numbers - affiche les nombres
  * @separator: chaine de caractère de séparation entre les nombres
  * @n: constante <= 0
- * Return: somme de tous les parametres
+ * Return: 0 si = null
  */
 void print_numbers(const char *separator, const unsigned int n, ...)
 {

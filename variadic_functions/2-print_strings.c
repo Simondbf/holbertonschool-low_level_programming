@@ -6,7 +6,7 @@
  * print_strings - affiche de chaines de caractères
  * @separator: chaine de caractère de séparation entre les nombres
  * @n: constante <= 0
- * Return: suite des caractères
+ * Return: 0 si = null
  */
 void print_strings(const char *separator, const unsigned int n, ...)
 {
