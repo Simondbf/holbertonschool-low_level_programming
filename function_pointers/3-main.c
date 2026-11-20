@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 	}
 
 	/*s'in n'y a pas l'un des opérateur correctement écrit*/
-	else if (b == 0 && (argv[2] == '/' || argv[2] == '%'))
+	else if (b == 0 && (operation == op_div || operation == op_mod))
 	{
 		printf("Error\n");
 		exit(100);
