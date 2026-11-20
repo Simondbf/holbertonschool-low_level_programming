@@ -15,7 +15,7 @@ void print_all(const char * const format, ...)
 	const char *list = format;
 
 	va_start(chain, format);
-	while (list[index] != '\0' && list != NULL)
+	while (list != NULL && list[index] != '\0')
 	{
 		switch (list[index])
 		{
