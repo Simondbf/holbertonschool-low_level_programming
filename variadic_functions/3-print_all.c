@@ -11,26 +11,26 @@ void print_all(const char * const format, ...)
 {
 	va_list chain;
 	int index = 0;
-	char *fin = ", ", *string;
+	char *fin = "", *string;
+	const char *list = format;
 
-	while (format == NULL)
-	{
-		putchar('\n');
-		return;
-	}
 	va_start(chain, format);
-	while (format[index] != '\0')
+	while (list[index] != '\0' && list != NULL)
 	{
-		switch (format[index])
+		switch (list[index])
 		{
 			case 'c':
-				printf("%c", va_arg(chain, int));
+				/*on ajoute la donnée de la séparation (fin) avant le texte imprimer*/
+				printf("%s%c", fin, va_arg(chain, int));
+				fin = ", ";
 				break;
 			case 'i':
-				printf("%d", va_arg(chain, int));
+				printf("%s%d", fin, va_arg(chain, int));
+				fin = ", ";
 				break;
 			case 'f':
-				printf("%f", va_arg(chain, double));
+				printf("%s%f", fin, va_arg(chain, double));
+				fin = ", ";
 				break;
 			case 's':
 				string = va_arg(chain, char *);
@@ -39,13 +39,10 @@ void print_all(const char * const format, ...)
 					printf("(nil)");
 					break;
 				}
-				printf("%s", string);
-				break;
-			default:
+				printf("%s%s", fin, string);
+				fin = ", ";
 				break;
 		}
-		if (format[index + 1] != '\0')
-			printf("%s", fin);
 		index++;
 	}
 	putchar('\n');
