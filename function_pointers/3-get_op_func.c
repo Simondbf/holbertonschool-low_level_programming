@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h> /*permet d'avoir strcmp (comparaison)*/
 #include "3-calc.h"
 
 /**
@@ -26,4 +27,5 @@ int (*get_op_func(char *s))(int, int)
 
 		i++;
 	}
+	return (NULL);
 }
