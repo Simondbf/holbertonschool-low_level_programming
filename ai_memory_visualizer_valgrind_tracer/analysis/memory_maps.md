@@ -1,99 +1,112 @@
-# Cartographies mémoire — AI Memory Visualizer
+# Cartographies mémoire — Tâche 0 (AI Memory Visualizer)
 
-> Analyse synthétique de l'état mémoire (pile, tas, durées de vie et alias de pointeurs) des 4 programmes de `programs/`, vérifiée par exécution réelle sur Linux x86-64 (`glibc`, sans Valgrind, code non modifié).
+> Analyse de la mémoire (pile, tas, durées de vie et alias de pointeurs) des quatre programmes de `programs/` sur Linux x86-64 (`sizeof(int) == 4`, `sizeof(void *) == 8`, `sizeof(Person) == 16`), vérifiée par exécution réelle sans Valgrind et sans aucune modification du code source.
 
----
+## Vue d'ensemble
 
-## Synthèse globale
-
-| Programme | Zone clé | Durée de vie / Alias | Comportement réel (`./binaire`) | Diagnostic mémoire |
+| Programme | Pile (Stack) | Tas (Heap utilisateur) | Alias de pointeurs | Bug / Comportement observé |
 | :--- | :--- | :--- | :--- | :--- |
-| **`stack_example.c`** | Pile (`0x7fff...`, croît vers le bas) | Cadres automatiques ; alias `p_local == &local_int` | `exit 0` | Sains : 4 cadres récursifs (`-48` o/appel) + réutilisation exacte des cadres `dump_frame`. |
-| **`heap_example.c`** | Tas (`0x63ae...`, croît vers le haut) | 4 blocs dynamiques ; alias `p == alice` lors du `free` | `exit 0` | **Fuite de 6 octets** (`"Alice\0"` orphelin après `person_free_partial`). |
-| **`aliasing_example.c`** | Pile + Tas (`0x5f5c...`) | Alias `b == a` sur bloc de 20 o | `exit 0`, `b[2]=-738082945`, `b[3]=1234` | **Use-after-free** + corruption silencieuse des métadonnées `tcache` de `glibc`. |
-| **`crash_example.c`** | Pile (`nums = 0x0`) | Aucun bloc tas alloué | **`Segmentation fault` (`SIGSEGV`)** | Écriture à `0x0` (page zéro non mappée par le noyau). |
-
-*Repères x86-64 : `sizeof(int) = 4` o, `sizeof(void *) = 8` o, `sizeof(Person) = 16` o (`8 + 4 + 4` o de padding), chunk `glibc` minimal = `32` o (`0x20`). Chaînes littérales dans `.rodata` (durée de vie statique).*
+| **`stack_example.c`** | 4 cadres `walk_stack` (`-48` o/appel) + `dump_frame` réutilisé | 0 o | `p_local == &local_int` | Aucun bug — réutilisation exacte des adresses de pile |
+| **`heap_example.c`** | `alice`, `bob` (`main`), `p` (`person_free_partial`) | 4 blocs (`42` o demandés, `32` o/chunk `glibc`) | `p == alice` lors de `person_free_partial` | **Fuite mémoire de 6 o** (`"Alice\0"`, *definitely lost*) |
+| **`aliasing_example.c`** | `n`, `a`, `b` (`main`) | 1 bloc de `20` o (`int[5]`) | `b == a == 0x5f5c9f3c0420` | **Use-after-free** : `b[2]=-738082945` (métadonnées `tcache`), `b[3]=1234` (corruption), pas de crash |
+| **`crash_example.c`** | `n`, `nums` (`main`) | 0 o (`malloc` non appelé) | Aucun | Déréférencement `NULL` (`0x0`) → **`SIGSEGV` immédiat** |
 
 ---
 
 ## 1. `stack_example.c` — Récursion et cadres de pile
 
-* **Tas :** `0` octet alloué par le programme C *(hors allocations internes éventuelles de `glibc`/`printf`)*.
-* **Durée de vie :** `marker` vit pendant son appel `walk_stack(depth)` ; `local_int`, `local_buf` et `p_local` ne vivent que le temps d'un appel `dump_frame` (dépilé immédiatement).
-* **Alias :** `p_local == &local_int` (alias local, détruit avec le cadre, jamais *dangling*).
+La pile croît vers les **adresses basses** (`-0x30` = `-48` octets par appel récursif de `walk_stack`). Chaque appel à `dump_frame` est dépilé immédiatement avant l'instruction suivante, ce qui explique que `[enter]` et `[exit]` occupent exactement les mêmes adresses à profondeur égale.
 
-| `depth` | `&marker` (`walk_stack`) | Écart | `&local_int` (`enter` **et** `exit`) | `local_buf` (`enter` **et** `exit`) |
-| :---: | :---: | :---: | :---: | :---: |
-| `0` | `0x7fff383e17c4` (`0`) | — | `0x7fff383e1774` (`100`) | `0x7fff383e1780` (`"A"`) |
-| `1` | `0x7fff383e1794` (`10`) | `-48` o (`-0x30`) | `0x7fff383e1744` (`101`) | `0x7fff383e1750` (`"B"`) |
-| `2` | `0x7fff383e1764` (`20`) | `-48` o (`-0x30`) | `0x7fff383e1714` (`102`) | `0x7fff383e1720` (`"C"`) |
-| `3` | `0x7fff383e1734` (`30`) | `-48` o (`-0x30`) | `0x7fff383e16e4` (`103`) | `0x7fff383e16f0` (`"D"`) |
+| Profondeur | `&marker` (`walk_stack`) | Écart | `&local_int` (`[enter]` et `[exit]`) | `p_local` (alias) | `local_buf` |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `depth=0` | `0x7fff383e17c4` (`0`) | — | `0x7fff383e1774` (`100`) | `0x7fff383e1774` | `0x7fff383e1780` (`"A"`) |
+| `depth=1` | `0x7fff383e1794` (`10`) | `-48` o | `0x7fff383e1744` (`101`) | `0x7fff383e1744` | `0x7fff383e1750` (`"B"`) |
+| `depth=2` | `0x7fff383e1764` (`20`) | `-48` o | `0x7fff383e1714` (`102`) | `0x7fff383e1714` | `0x7fff383e1720` (`"C"`) |
+| `depth=3` | `0x7fff383e1734` (`30`) | `-48` o | `0x7fff383e16e4` (`103`) | `0x7fff383e16e4` | `0x7fff383e16f0` (`"D"`) |
 
 ```text
 PILE au pic ([enter] depth=3) — croît vers les adresses basses
-[walk_stack 0] marker=0  @ ...17c4
-[walk_stack 1] marker=10 @ ...1794  (-48 o)
-[walk_stack 2] marker=20 @ ...1764  (-48 o)
-[walk_stack 3] marker=30 @ ...1734  (-48 o)
-[dump_frame 3] local_buf @ ...16f0 ("D") | local_int @ ...16e4 (103) | p_local = ...16e4
+[walk_stack 0] marker=0  @ 0x7fff383e17c4
+[walk_stack 1] marker=10 @ 0x7fff383e1794  (-48 o)
+[walk_stack 2] marker=20 @ 0x7fff383e1764  (-48 o)
+[walk_stack 3] marker=30 @ 0x7fff383e1734  (-48 o)
+[dump_frame 3] local_buf @ 0x7fff383e16f0 ("D") | local_int @ 0x7fff383e16e4 (103) | p_local = 0x7fff383e16e4
 ```
 
-> **Point clé :** `[enter]` et `[exit]` ont les **mêmes adresses** à chaque profondeur, preuve que chaque cadre `dump_frame` est dépilé puis réutilisé.
+* **Durée de vie :** automatique (limitée au cadre de chaque fonction). Les chaînes littérales (`"enter"`, `"exit"`) résident dans `.rodata` (durée de vie statique).
+* **Alias :** `p_local` pointe sur `local_int` dans le même cadre et disparaît en même temps que lui (aucun pointeur pendant).
+* **Tas :** `0` octet alloué par le programme C *(hors allocations internes éventuelles de `glibc`/`printf`)*.
 
 ---
 
-## 2. `heap_example.c` — Tas et fuite mémoire volontaire
+## 2. `heap_example.c` — Allocations sur le tas et fuite mémoire
 
-* **Durée de vie :** les variables locales de `person_new()` sont dépilées au `return`, mais les **4 blocs `malloc`** survivent sur le tas jusqu'au `free()` (ou la fin du processus).
-* **Alias :** dans `person_free_partial(alice)`, le paramètre `p` (pile) est un **alias d'`alice`** (`0x63ae18d67420`). Libérer `p` invalide `alice` sans libérer `alice->name`.
+Le tas croît vers les **adresses hautes**, avec un écart constant de `+0x20` (`32` octets, taille minimale d'un chunk `glibc` sur 64 bits).
 
-| Bloc tas | Adresse réelle | Demandé / Chunk | Contenu | État en fin de `main()` |
-| :--- | :---: | :---: | :--- | :--- |
-| `alice` (`Person`) | `0x63ae18d67420` | `16` o / `32` o | `name=...7440`, `age=30` | Libéré (`person_free_partial`) |
-| `alice->name` | `0x63ae18d67440` | `6` o / `32` o | `"Alice\0"` | **FUITE (*definitely lost*)** |
-| `bob` (`Person`) | `0x63ae18d67460` | `16` o / `32` o | `name=...7480`, `age=41` | Libéré (`free(bob)`) |
+| Bloc tas | Adresse observée | Taille demandée / Chunk | Contenu | État en fin de `main()` |
+| :--- | :--- | :--- | :--- | :--- |
+| `alice` (`Person`) | `0x63ae18d67420` | `16` o (`8 + 4 + 4` padding) / `32` o | `name=0x...7440`, `age=30` | Libéré via `person_free_partial(alice)` |
+| `alice->name` | `0x63ae18d67440` | `6` o / `32` o | `"Alice\0"` | **Fuite mémoire** (*definitely lost*) |
+| `bob` (`Person`) | `0x63ae18d67460` | `16` o (`8 + 4 + 4` padding) / `32` o | `name=0x...7480`, `age=41` | Libéré (`free(bob)`) |
 | `bob->name` | `0x63ae18d67480` | `4` o / `32` o | `"Bob\0"` | Libéré (`free(bob->name)`) |
 
 ```text
-Fin de main() :
-PILE: alice = ...7420 (dangling) --X--> TAS: ...7420 [LIBÉRÉ]
-                                             ...7440 [6 o "Alice\0"] <-- ORPHELIN (fuite)
-PILE: bob   = ...7460 (dangling) --X--> TAS: ...7460 [LIBÉRÉ] / ...7480 [LIBÉRÉ]
+État en fin de main() :
+PILE: alice = 0x63ae18d67420 (dangling) --X--> TAS: 0x63ae18d67420 [LIBÉRÉ]
+                                                    0x63ae18d67440 [6 o "Alice\0"] <-- ORPHELIN (fuite)
+PILE: bob   = 0x63ae18d67460 (dangling) --X--> TAS: 0x63ae18d67460 [LIBÉRÉ] / 0x63ae18d67480 [LIBÉRÉ]
 ```
+
+* **Durée de vie :** les variables locales de `person_new()` sont dépilées au `return`, mais les 4 blocs tas persistent. `bob` et `bob->name` vivent jusqu'aux `free()` explicites ; `alice->name` reste alloué jusqu'à la fin du processus.
+* **Alias :** dans `person_free_partial(Person *p)`, `p` (pile) est un alias d'`alice` (`0x63ae18d67420`). `free(p)` libère la structure sans libérer `p->name`, rendant `0x63ae18d67440` inatteignable.
 
 ---
 
 ## 3. `aliasing_example.c` — Aliasing et *Use-After-Free*
 
-* **Alias :** `a` et `b` sont 2 variables distinctes sur la pile (`&a != &b`), mais pointent vers le même bloc tas de `20` o (`0x5f5c9f3c0420`).
-* **Durée de vie :** `free(a)` met fin à la vie du bloc mais laisse `a` et `b` inchangés (**tous deux *dangling***).
-* **Pourquoi pas de crash ?** `free(a)` rend le chunk au `tcache` de `glibc` (page toujours mappée en lecture/écriture par l'OS), sans `munmap`.
+`a` et `b` sont deux variables distinctes sur la pile (`&a != &b`) contenant toutes deux `0x5f5c9f3c0420` (bloc de `20` octets sur le tas). Après `free(a)`, les deux deviennent simultanément des pointeurs pendants (*dangling pointers*).
 
-| Index | Offset | Avant `free(a)` | Après `free(a)` (`glibc` `tcache_entry`) | Action dans `main()` |
-| :---: | :---: | :---: | :--- | :--- |
-| `b[0..1]` | `+0..+7` | `0`, `11` | `tcache->next` (pointeur libre) | Non accédé |
-| `b[2]` | `+8..+11` | `22` | `tcache->key` (bas) | **Lecture invalide** → `-738082945` |
-| `b[3]` | `+12..+15` | `33` | `tcache->key` (haut) | **Écriture invalide (`1234`)** → corruption `tcache` |
-| `b[4]` | `+16..+19` | `44` | `44` (résiduel) | Non accédé |
+| Offset dans le bloc (`0x5f5c9f3c0420`) | Avant `free(a)` | Après `free(a)` (`tcache` `glibc`) | Action du programme |
+| :--- | :--- | :--- | :--- |
+| `+0..+7` (`b[0]`, `b[1]`) | `0`, `11` | `tcache_entry->next` | Non accédé |
+| `+8..+11` (`b[2]`) | `22` | `tcache_entry->key` (bas) | **Lecture invalide** → `-738082945` |
+| `+12..+15` (`b[3]`) | `33` | `tcache_entry->key` (haut) | **Écriture invalide (`1234`)** → corruption du `tcache` |
+| `+16..+19` (`b[4]`) | `44` | Donnée résiduelle | Non accédé |
+
+* **Pourquoi aucun crash sans Valgrind ?** `free(a)` renvoie le bloc au cache interne de `glibc` (`tcache`), sans appeler `munmap()` auprès du noyau. La page reste mappée en lecture/écriture, donc l'accès passe silencieusement malgré le comportement indéfini (*Undefined Behavior*).
 
 ---
 
 ## 4. `crash_example.c` — Déréférencement de `NULL`
 
-* **Tas :** `0` octet alloué par le programme (`if (n <= 0) return NULL;` s'exécute avant `malloc`).
-* **Crash :** `nums[0] = 42;` écrit `4` octets à l'adresse virtuelle `0x0`. La page zéro n'étant jamais mappée par Linux, le noyau envoie immédiatement **`SIGSEGV`** (`printf` et `free` ne sont jamais atteints).
+| Étape | État de `nums` (pile) | État du tas | Résultat |
+| :--- | :--- | :--- | :--- |
+| `allocate_numbers(0)` | `0x0` (`NULL`) | `0` o alloué (`if (n <= 0) return NULL;`) | Retour immédiat avant `malloc` |
+| `nums[0] = 42;` | `0x0` (`NULL`) | `0` o alloué | Écriture de 4 o à `0x0` (page zéro non mappée) → **`SIGSEGV`** |
 
 ```text
 PILE (main): n = 0, nums = 0x0 --X--> PAGE 0x0 (NON MAPPÉE) ==> SIGSEGV immédiat
 ```
 
+* Les lignes `printf("  nums[0]=%d\n", nums[0]);` et `free(nums);` ne sont jamais atteintes.
+
 ---
 
-## 5. Erreurs de l'IA détectées et corrigées
+## 5. Audit critique : erreurs de l'IA et corrections apportées
 
-| # | Programme | Erreur initiale de l'IA | Réalité observée | Correction apportée |
-| :---: | :--- | :--- | :--- | :--- |
-| **1** | `aliasing_example.c` | A prédit soit que `b[2]`/`b[3]` restent inchangés, soit que le programme plante après `free(a)`. | `./aliasing` affiche `b[2]=-738082945`, écrit `b[3]=1234` et termine avec `exit 0`. | Prise en compte de `tcache_entry` (`glibc` 2.29+, 16 o) : `free(a)` écrase `+8..+15` avec `tcache->key` sur une page restée mappée. |
-| **2** | `stack_example.c` & `crash_example.c` | A affirmé « Tas totalement vide (0 octet) » de façon absolue. | Dans `./heap` et `./aliasing`, le 1er `malloc` démarre à `...420` (allocations internes `glibc` préalables). | Distinction explicite entre **0 octet alloué par le programme C** et les allocations internes de `glibc` (`tcache` / `stdout`). |
-| **3** | `stack_example.c` & `heap_example.c` | Raccourcis classiques : adresses distinctes entre `[enter]`/`[exit]`, ou `sizeof(Person) == 12` o. | Adresses identiques entre `[enter]`/`[exit]` (`-48` o/appel) ; pas de `32` o entre chunks sur le tas. | Intégration des adresses réelles, des **16 octets** de `Person` (`4` o de padding) et du chunk minimal de **32 octets**. |
+| Programme | Affirmation initiale de l'IA (erronée ou imprécise) | Vérification réelle et correction |
+| :--- | :--- | :--- |
+| `aliasing_example.c` | `free(a)` rend la mémoire à l'OS et fait planter `b[2]` / `b[3] = 1234` (ou laisse `b[2]` intact à `22`). | **Faux.** `./aliasing` termine sans crash (`exit 0`) et affiche `b[2]=-738082945` : la page reste mappée et `glibc` écrase les 16 premiers octets (`b[0..3]`) avec les métadonnées `tcache_entry` (`next` + `key`). |
+| `stack_example.c` & `crash_example.c` | « Le tas est strictement vide (0 octet) dans le processus. » | **Imprécis.** Il y a `0` octet alloué par le *code utilisateur*, mais `glibc` effectue ses propres allocations internes sur le tas (ex. tampon `stdout` de `printf` / structures `tcache`), visibles via l'offset initial `...420` dans `./heap` et `./aliasing`. |
+| `stack_example.c` | Les appels `dump_frame("enter")` et `dump_frame("exit")` s'empilent à des adresses différentes. | **Faux.** À profondeur égale, `&local_int` est identique à l'entrée et à la sortie (`0x7fff383e16e4` à `depth=3`), prouvant le dépilement et la réutilisation immédiate du cadre. |
+| `heap_example.c` | `sizeof(Person)` vaut `12` octets (`8 + 4`). | **Faux.** Sur x86-64, l'alignement sur 8 octets ajoute `4` octets de padding après `int age` → `sizeof(Person) == 16` octets (alloués dans un chunk `glibc` de `32` octets). |
+
+---
+
+## 6. Mini synthèse de ce qui a été fait
+
+* **Compilation des 4 programmes** de `programs/` (`stack`, `heap`, `aliasing`, `crash`) sans modifier le code source, en contournant le blocage `-Werror=use-after-free` de GCC sur `aliasing_example.c` via `-Wno-error=use-after-free`.
+* **Exécution réelle sans Valgrind** de chaque binaire et relevé des adresses effectives (`0x7fff...` sur la pile, `0x63ae...` / `0x5f5c...` sur le tas, et `SIGSEGV` sur `./crash`).
+* **Cartographie complète de la mémoire** pour les 4 cas : empilement/dépilement récursif, chunks du tas et fuite mémoire, aliasing et *use-after-free* avec corruption `tcache`, et déréférencement `NULL`.
+* **Vérification critique des réponses de l'IA** : identification, preuve par l'exécution et correction de 4 erreurs ou imprécisions (comportement de `free()`/`tcache`, allocations internes `glibc`, réutilisation des cadres de pile, padding de `struct Person`).
+* **Production du rapport final** structuré en tableaux Markdown dans `analysis/memory_maps.md`, prêt pour le dépôt GitHub.
