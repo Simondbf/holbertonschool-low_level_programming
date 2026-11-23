@@ -9,12 +9,12 @@
 
 ## 1. Tableau de synthèse global
 
-| Programme | Pile (Stack) | Tas (Heap utilisateur) | Alias de pointeurs | Comportement observé en exécution native |
+| Programme | Pile (Stack) | Tas (Heap utilisateur) | Alias de pointeurs | Propriété (*Ownership*) & Comportement observé |
 | :--- | :--- | :--- | :--- | :--- |
-| **`stack_example.c`** | 4 cadres `walk_stack` (`-48` o/appel) + `dump_frame` réutilisé | 0 o | `p_local == &local_int` | Aucun bug — réutilisation exacte des adresses de pile entre `[enter]` et `[exit]` |
-| **`heap_example.c`** | `alice`, `bob` (`main`), `p` (`person_free_partial`) | 4 blocs (42 o demandés, 32 o/chunk `glibc`) | `p == alice` dans `person_free_partial` | **Fuite mémoire de 6 o** (`"Alice\0"`, *definitely lost* par perte de propriété) |
-| **`aliasing_example.c`** | `n`, `a`, `b` (`main`) | 1 bloc de 20 o (`int[5]`) | `b == a == 0x5f5c9f3c0420` | ***Use-after-free* silencieux** : `b[2]=-738082945` (métadonnées `tcache`), `b[3]=1234` (corruption), aucun crash |
-| **`crash_example.c`** | `n`, `nums` (`main`) | 0 o (`malloc` non appelé) | Aucun | Déréférencement de `NULL` (`0x0`) → **`SIGSEGV` immédiat** |
+| **`stack_example.c`** | 4 cadres `walk_stack` (`-48` o/appel) + `dump_frame` réutilisé | 0 o | `p_local == &local_int` | Gestion automatique par cadre — réutilisation exacte des adresses de pile entre `[enter]` et `[exit]` |
+| **`heap_example.c`** | `alice`, `bob` (`main`), `p` (`person_free_partial`) | 4 blocs (42 o demandés, 32 o/chunk `glibc`) | `p == alice` dans `person_free_partial` | Propriété transférée à `main()` — **fuite de 6 o** (`"Alice\0"`) par perte de propriété dans `person_free_partial` |
+| **`aliasing_example.c`** | `n`, `a`, `b` (`main`) | 1 bloc de 20 o (`int[5]`) | `b == a == 0x5f5c9f3c0420` | Propriété transférée à `main()` via `a` (`b` alias non propriétaire) — ***use-after-free* silencieux** (`b[2]=-738082945`, `b[3]=1234`) |
+| **`crash_example.c`** | `n`, `nums` (`main`) | 0 o (`malloc` non appelé) | Aucun | Aucune allocation ni propriété transférée (`nums = NULL`) — déréférencement de `0x0` → **`SIGSEGV` immédiat** |
 
 ---
 
@@ -40,8 +40,8 @@ PILE au pic ([enter] depth=3) — croît vers les adresses basses
 [dump_frame 3] local_buf @ 0x7fff383e16f0 ("D") | local_int @ 0x7fff383e16e4 (103) | p_local = 0x7fff383e16e4
 ```
 
-* **Durée de vie :** automatique (chaque `marker` vit le temps de son instance de `walk_stack` ; `local_int`, `local_buf` et `p_local` disparaissent à la fin de chaque `dump_frame`). Les chaînes littérales (`"enter"`, `"exit"`) résident dans `.rodata` (durée de vie statique).
-* **Alias :** `p_local` est un alias local de `local_int` (`p_local == &local_int`) qui ne sort jamais de son cadre (aucun pointeur pendant).
+* **Durée de vie et propriété :** stockage automatique géré par le compilateur (aucun `free` manuel). Chaque `marker` vit uniquement le temps de son appel récursif `walk_stack` ; `local_int`, `local_buf` et `p_local` sont détruits dès le retour de chaque `dump_frame` (la mémoire pile ne survit jamais au retour de fonction). Les chaînes littérales (`"enter"`, `"exit"`) résident dans `.rodata` (durée de vie statique).
+* **Alias :** `p_local` est un alias local de `local_int` (`p_local == &local_int`) qui ne quitte jamais son cadre (aucun pointeur pendant).
 * **Tas :** 0 octet alloué par le code utilisateur *(hors tampon interne éventuel de `glibc`/`printf`)*.
 
 ---
@@ -64,8 +64,9 @@ PILE: alice = 0x63ae18d67420 (dangling) --X--> TAS: 0x63ae18d67420 [LIBÉRÉ]
 PILE: bob   = 0x63ae18d67460 (dangling) --X--> TAS: 0x63ae18d67460 [LIBÉRÉ] / 0x63ae18d67480 [LIBÉRÉ]
 ```
 
-* **Durée de vie :** les variables locales de `person_new()` sont dépilées au `return`, tandis que les 4 blocs sur le tas persistent. `bob` et `bob->name` sont libérés dans le bon ordre ; `alice->name` reste alloué jusqu'à la fin du processus.
-* **Alias et perte de propriété :** dans `person_free_partial(Person *p)`, le paramètre `p` sur la pile est un alias d'`alice` (`0x63ae18d67420`). `free(p)` détruit la structure avant de libérer `p->name`, supprimant la seule référence vers `0x63ae18d67440` (*leak due to lost ownership*).
+* **Durée de vie et propriété (*Ownership*) :** les variables locales de `person_new()` sont dépilées au `return`, mais les 4 blocs tas persistent. `person_new()` **transfère la propriété complète des deux blocs (`Person` et `name`) à l'appelant (`main()`)**, qui a donc la responsabilité de libérer `p->name` **avant** `p` :
+  * Pour `bob`, `main()` respecte ce contrat (`free(bob->name)` puis `free(bob)`).
+  * Pour `alice`, `main()` délègue la libération à `person_free_partial(alice)` où le paramètre pile `p` est un alias d'`alice` (`0x63ae18d67420`). `free(p)` libère la structure avant `p->name`, détruisant le seul pointeur vers `0x63ae18d67440` (*leak due to lost ownership*).
 
 ---
 
@@ -80,7 +81,8 @@ PILE: bob   = 0x63ae18d67460 (dangling) --X--> TAS: 0x63ae18d67460 [LIBÉRÉ] / 
 | `+12..+15` (`b[3]`) | `33` | `tcache_entry->key` (haut) | **Écriture invalide (`1234`)** puis relecture → corruption du `tcache` |
 | `+16..+19` (`b[4]`) | `44` | Donnée résiduelle | Non accédé |
 
-* **Pourquoi aucun crash en exécution native ?** `free(a)` rend ce petit bloc au cache interne de l'allocateur `glibc` (`tcache`) sans démaper la page virtuelle auprès du noyau OS (`munmap()`). Les lectures et écritures hors durée de vie frappent une page toujours mappée en lecture/écriture : le bug corrompt les métadonnées internes du tas mais passe silencieusement sans Valgrind.
+* **Propriété (*Ownership*) et alias :** `make_numbers()` alloue le bloc de 20 octets et **transfère sa propriété à `main()` via `a`** (qui passe de `NULL` à `0x5f5c9f3c0420`). L'affectation `b = a;` crée un **alias non propriétaire** pointant sur le même bloc. `main()` doit libérer ce bloc **une seule fois** (`free(a)`), ce qui termine immédiatement sa durée de vie pour tous les alias (`a` et `b`).
+* **Pourquoi aucun crash en exécution native ?** `free(a)` rend ce petit bloc au cache interne de l'allocateur `glibc` (`tcache`) sans démapper la page virtuelle auprès du noyau OS (`munmap()`). Les lectures et écritures hors durée de vie frappent une page toujours mappée en lecture/écriture : le bug corrompt les métadonnées internes du tas mais passe silencieusement sans Valgrind.
 
 ---
 
@@ -95,11 +97,13 @@ PILE: bob   = 0x63ae18d67460 (dangling) --X--> TAS: 0x63ae18d67460 [LIBÉRÉ] / 
 PILE (main): n = 0, nums = 0x0 --X--> PAGE 0x0 (NON MAPPÉE PAR LE NOYAU) ==> SIGSEGV immédiat
 ```
 
-* Les instructions suivantes (`printf("  nums[0]=%d\n", nums[0]);` et `free(nums);`) ne sont jamais exécutées.
+* **Propriété (*Ownership*) :** pour `n = 0`, aucun bloc tas n'est créé et aucune propriété n'est transférée (`nums` reste `NULL`, il n'y a rien à libérer). Pour `n > 0`, `allocate_numbers()` transférerait la propriété du tableau à `main()`, qui devrait le libérer via `free(nums)` (ligne 36) — instruction jamais atteinte ici à cause du `SIGSEGV` ligne 32.
 
 ---
 
-## 3. Audit critique : erreurs de l'IA et corrections apportées
+## 3. Audit critique : usage de l'IA, erreurs et corrections apportées
+
+L'IA a été utilisée comme point de départ pour générer des hypothèses de schémas mémoire étape par étape (pile, tas, durées de vie et alias), ensuite confrontées systématiquement aux sorties et adresses réelles des binaires.
 
 | Programme | Erreur ou imprécision initiale de l'IA | Pourquoi c'était incorrect / incomplet | Correction apportée après vérification |
 | :--- | :--- | :--- | :--- |
@@ -112,7 +116,7 @@ PILE (main): n = 0, nums = 0x0 --X--> PAGE 0x0 (NON MAPPÉE PAR LE NOYAU) ==> SI
 
 ## 4. Résumé
 
-* **Pile vs Tas (comportements opposés) :** la pile (`0x7fff...`) est gérée automatiquement, croît vers les adresses basses (`-48` o par appel récursif dans `./stack`) et réutilise immédiatement les cadres dépilés ; le tas (`0x63ae...`, `0x5f5c...`) est géré manuellement, croît vers les adresses hautes par chunks minimaux de 32 octets (`glibc`) et survit au retour des fonctions.
-* **Durée de vie et propriété :** un bloc sur le tas sans pointeur atteignable devient une fuite définitive (`alice->name`, 6 o perdus dans `./heap` car la structure parente a été libérée avant son champ). À l'inverse, un accès à `0x0` (`./crash`) provoque un arrêt matériel immédiat (`SIGSEGV`) car la page zéro n'est jamais mappée.
-* **Danger de l'aliasing silencieux :** dans `./aliasing`, libérer `a` invalide instantanément son alias `b`, mais l'exécution native ne plante pas ; elle lit et corrompt les métadonnées internes du `tcache` `glibc` (`b[2]=-738082945`, `b[3]=1234`), illustrant pourquoi l'absence de crash ne prouve jamais l'absence de bug mémoire.
-* **Vérification expérimentale indispensable :** confronter les hypothèses de l'IA aux adresses réelles a permis de corriger 4 erreurs concrètes (padding de `struct Person`, réutilisation de pile, allocations internes `glibc`, et comportement du `tcache` après `free()`).
+* **Pile vs Tas (comportements opposés) :** la pile (`0x7fff...`) est gérée automatiquement, croît vers les adresses basses (`-48` o par appel récursif dans `./stack`) et réutilise immédiatement les cadres dépilés ; le tas (`0x63ae...`, `0x5f5c...`) est géré manuellement, croît vers les adresses hautes par chunks minimaux de 32 octets (`glibc`) et survit au retour des fonctions jusqu'au `free()` du propriétaire.
+* **Durée de vie et propriété (*Ownership*) :** chaque fonction d'allocation (`person_new`, `make_numbers`) transfère la propriété à `main()`. Rompre ce contrat détruit la référence vers le bloc enfant (`alice->name`, 6 o perdus dans `./heap`), tandis qu'un accès à `0x0` (`./crash`) provoque un arrêt matériel immédiat (`SIGSEGV`) car la page zéro n'est jamais mappée.
+* **Danger de l'aliasing silencieux :** dans `./aliasing`, libérer `a` invalide instantanément son alias non propriétaire `b`, mais l'exécution native ne plante pas ; elle lit et corrompt les métadonnées internes du `tcache` `glibc` (`b[2]=-738082945`, `b[3]=1234`), illustrant pourquoi l'absence de crash ne prouve jamais l'absence de bug mémoire.
+* **Vérification expérimentale indispensable :** traiter les schémas de l'IA comme des hypothèses à confronter aux adresses réelles a permis de corriger 4 erreurs concrètes (padding de `struct Person`, réutilisation de pile, allocations internes `glibc`, et comportement du `tcache` après `free()`).
