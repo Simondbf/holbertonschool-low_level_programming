@@ -22,7 +22,7 @@ L'exécution de `./crash` se termine de manière **100 % déterministe** par un 
 
 ## 2. Analyse de la cause racine (*Root Cause Analysis*)
 
-Le crash n'est ni aléatoire ni dû à un échec d'allocation système : il découle d'une **absence de vérification de valeur de retour `NULL`** dans `main()` après un appel qui garantit ce retour pour `n <= 0`.
+Le crash n'est ni aléatoire ni dû à un échec d'allocation système : il découle d'une **absence de vérification de valeur de retour `NULL`** dans `main()` après un appel qui garantit ce retour pour `n <= 0`. Ce raisonnement est entièrement déductible par lecture statique du code source, sans relancer le binaire.
 
 ### Chaîne causale complète (du code source au signal `SIGSEGV`)
 
@@ -30,7 +30,7 @@ Le crash n'est ni aléatoire ni dû à un échec d'allocation système : il déc
 | :-: | :--- | :--- | :--- |
 | 1 | `crash_example.c:24-25` | `int *nums = NULL; int n = 0;` | Variables locales initialisées sur la pile de `main()` (`nums = 0x0`, `n = 0`). |
 | 2 | `crash_example.c:30` | `nums = allocate_numbers(n);` | Appel de `allocate_numbers(0)` : création d'un cadre de pile (`n = 0`, `arr = NULL`, `i = 0`). |
-| 3 | `crash_example.c:9-10` | `if (n <= 0) return NULL;` | Condition vraie (`0 <= 0`) : sortie anticipée **avant** `malloc()` (ligne 12). Le cadre est dépilé. |
+| 3 | `crash_example.c:9-10` | `if (n <= 0) return NULL;` | Condition vraie (`0 <= 0`) : sortie anticipée **avant** `malloc()` (ligne 12). Aucun bloc tas n'est alloué et aucune propriété n'est transférée ; le cadre est dépilé. |
 | 4 | `crash_example.c:30` | Affectation du retour dans `nums` | `nums` (sur la pile de `main()`) vaut toujours `0x0` (`NULL`). |
 | 5 | `crash_example.c:32` | `nums[0] = 42;` (`*(nums + 0) = 42;`) | Aucune garde `if (!nums)` : tentative d'écriture de 4 octets (`int`) à l'adresse virtuelle `0x0`. |
 | 6 | Matériel / Noyau | Faute de page (*page fault*) sur `0x0` | Adresse hors région mappée → le noyau Linux délivre `SIGSEGV` → arrêt immédiat. |
@@ -40,7 +40,7 @@ Le crash n'est ni aléatoire ni dû à un échec d'allocation système : il déc
 | Zone mémoire | Rôle exact dans ce crash |
 | :--- | :--- |
 | **Pile (Stack)** | Contient les variables locales `n` et `nums` de `main()`. La lecture de la valeur `0x0` stockée dans `nums` est **valide** : la pile n'est pas corrompue ni saturée. |
-| **Tas (Heap)** | **Aucun bloc utilisateur n'est alloué** (`malloc` ligne 12 n'est jamais atteint). Le seul bloc présent sur le tas au moment du crash est le tampon interne `stdout` de `glibc` (1 024 o alloué à la ligne 27 via `printf`/`puts`), totalement étranger au crash. |
+| **Tas (Heap)** | **Aucun bloc utilisateur n'est alloué** (`malloc` ligne 12 n'est jamais atteint ; pour `n > 0`, `allocate_numbers()` transférerait la propriété du tableau à `main()` qui le libérerait via `free(nums)` ligne 36). Le seul bloc présent sur le tas au moment du crash est le tampon interne `stdout` de `glibc` (1 024 o alloué à la ligne 27 via `printf`/`puts`), totalement étranger au crash. |
 | **Adresse cible (`0x0`)** | L'accès invalide ne touche **ni la pile ni le tas** : il cible l'adresse virtuelle `0x0` (page zéro, non mappée). |
 
 ---
@@ -56,6 +56,8 @@ Le crash n'est ni aléatoire ni dû à un échec d'allocation système : il déc
 
 ## 4. Évaluation critique des explications et correctifs proposés par l'IA
 
+L'IA a été sollicitée comme générateur d'hypothèses pour lister des causes probables et des correctifs possibles au `SIGSEGV`, puis chaque suggestion a été vérifiée ou réfutée indépendamment par analyse statique du code source et recoupement avec les traces de la Tâche 1.
+
 | Suggestion de l'IA (cause ou correctif) | Verdict | Justification technique (code + exécution) |
 | :--- | :---: | :--- |
 | *« `allocate_numbers(0)` retourne `NULL` à cause de la garde `if (n <= 0)`, et `main()` déréférence `nums` ligne 32 sans vérifier `if (!nums)`. »* | **Correct** | Directement vérifiable aux lignes 9-10, 30 et 32. Explique intégralement la chaîne causale sans hypothèse externe. |
@@ -68,7 +70,7 @@ Le crash n'est ni aléatoire ni dû à un échec d'allocation système : il déc
 
 ## 5. Correctif suggéré *(optionnel — non appliqué au code source)*
 
-Le correctif rigoureux consiste en priorité à **vérifier le pointeur retourné** avant tout déréférencement (et, si l'intention fonctionnelle est d'allouer un tableau, à passer une taille strictement positive `n > 0`) :
+Le correctif rigoureux consiste en priorité à **vérifier le pointeur retourné** avant tout déréférencement (et, si l'intention fonctionnelle est d'allouer un tableau, à passer une taille strictement positive `n > 0` afin que `main()` en reçoive la propriété et le libère ensuite via `free(nums)`) :
 
 ```c
 nums = allocate_numbers(n);
