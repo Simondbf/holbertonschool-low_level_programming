@@ -1,0 +1,1 @@
+découverte des listes chainées. Permet de minimiser la place nécessaire sur une liste car possibilité de dispatcher partout où il y a de la place dans la mémoire
