@@ -4,7 +4,6 @@
 
 /**
  * print_list - affiche tous les élement d'une liste chainée
- * @list_t: type de la liste
  * @h: pointeur vers le début de la liste
  * Return: nombre de noeuds dans la listes
  */
