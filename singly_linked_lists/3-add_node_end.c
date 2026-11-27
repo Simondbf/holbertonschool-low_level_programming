@@ -6,7 +6,7 @@
 
 /**
 * add_node_end - ajoute un noeud à la fin de la liste
-* @head: double pointeur vers le 1er noeud
+* @head: double pointeur vers le dernier noeud
 * @str: chaine de caractère
 * Return: la longueur de la liste
 */
