@@ -1,18 +1,19 @@
-#include <stdio.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include "lists.h"
 
 /**
-* free_list - libérer l'ensemble de la mémoire prise
-* @head: pointeur vers le 1er noeud
-* Return: la longueur de la liste
-*/
-
+ * free_list - libère une liste chaînée
+ * @head: pointeur vers le 1er noeud
+ */
 void free_list(list_t *head)
 {
-	list_t *node;
+	list_t *temp;
 
-	free(node);
-	node = NULL;
+	while (head != NULL)
+	{
+		temp = head->next;
+		free(head->str);
+		free(head);
+		head = temp;
+	}
 }
