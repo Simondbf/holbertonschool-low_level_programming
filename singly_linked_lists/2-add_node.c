@@ -42,7 +42,7 @@ list_t *add_node(list_t **head, const char *str)
 
 	/*enregistrement du compteur dans la longueur du noeud*/
 	node->len = len_temp;
-	
+
 	/* lien entre le 1er noeud et le 2e*/
 	node->next = *head;
 
