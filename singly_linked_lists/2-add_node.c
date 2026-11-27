@@ -35,8 +35,6 @@ list_t *add_node(list_t **head, const char *str)
 		return (NULL);
 	}
 
-	/*connaitre la longueur de la chaine*/
-	node->len = strlen(str);
 
 	/* lien entre le 1er noeud et le 2e*/
 	node->next = *head;
