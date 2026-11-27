@@ -14,6 +14,7 @@
 list_t *add_node(list_t **head, const char *str)
 {
 	list_t *node;
+	int len_temp;
 
 	if (head == NULL || str == NULL)
 		return (NULL);
@@ -35,7 +36,13 @@ list_t *add_node(list_t **head, const char *str)
 		return (NULL);
 	}
 
+	/*connaitre la longueur de la chaine*/
+	for (len_temp = 0; str[len_temp] != '\0'; len_temp++)
+	{	}
 
+	/*enregistrement du compteur dans la longueur du noeud*/
+	node->len = len_temp;
+	
 	/* lien entre le 1er noeud et le 2e*/
 	node->next = *head;
 
